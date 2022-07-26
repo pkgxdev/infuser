@@ -1,0 +1,65 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Dockerfile
+      - .github/workflows/cd.yml
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: co infuser
+        uses: actions/checkout@v3
+        with:
+          path: infuser
+      - name: co pantry
+        uses: actions/checkout@v3
+        with:
+          repository: teaxyz/pantry
+          path: pantry
+          token: ${{ secrets.TEMP_JACOBS_GITHUB_PAT }}
+      - name: co cli
+        uses: actions/checkout@v3
+        with:
+          repository: teaxyz/cli
+          path: cli
+          token: ${{ secrets.TEMP_JACOBS_GITHUB_PAT }}
+
+      - uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/metadata-action@v4
+        id: meta
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: infuser/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,90 @@
+![tea.xyz](https://tea.xyz/banner.png)
+
+The infuser manages our docker images for platforms we support.
+
+Obviously this cannot include macOS because *Apple*.
+
+The result is a docker image that contains a c compiler and GNU make, with the
+platform’s libc. With this all other tea packages can be built.
+
+Our goal is to provide an image that is just libc and `tea` with a sensible
+(stable) kernel choice but currently we are not there.
+
+
+Getting Started
+---------------
+    export vDENO=1.23.3
+
+    mkdir tea
+    cd tea
+    git clone https://github.com/teaxyz/cli
+    git clone https://github.com/teaxyz/pantry
+    git clone https://github.com/teaxyz/infuser
+
+    docker build \
+      --tag ghcr.io/teaxyz/infuser:latest \
+      --file infuser/Dockerfile \
+      --build-arg vDENO=$vDENO \
+      --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
+      .
+
+    docker run \
+      --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
+      --hostname tea \
+      --interactive --tty \
+      ghcr.io/teaxyz/infuser:latest \
+      /bin/bash
+
+The best way to figure out the container name is with the docker
+dashboard GUI.
+
+`GITHUB_TOKEN` is required when building tea packages to use the GitHub
+GraphQL API for release and tag lookup. You will indeed need to generate a
+*personal access token* (PAT) (no additional permissions are required).
+
+
+Debugging
+---------
+Debugging is easier if you can hack using your native machine.
+
+    docker run \
+      --hostname tea \
+      --interactive --tty \
+      --volume $PWD/pantry:/opt/tea.xyz/var \
+      --volume $PWD/cli:/cli \
+      --volume $PWD/cli:/opt/tea.xyz/var/cli \
+      ghcr.io/teaxyz/infuser:latest \
+      /bin/bash
+
+Since nobody understands docker I am documenting here that you can
+“resume” your shell session in the above container created by `docker run`:
+
+    docker start $container
+    docker attach $container
+
+
+Troubleshooting
+---------------
+Use `--progress=plain` in the `docker build` instantiation to get logs
+
+
+Publishing Local Images
+-----------------------
+
+At this early stage we are building certain images locally and pushing to
+the GitHub package registry. This is not as secure as we’d like so we will be
+changing it.
+
+```sh
+HOST=ghcr.io/teaxyz/infuser
+docker tag $HOST:latest $HOST:sha-$SHA
+docker tag $HOST:latest $HOST:$BRANCH
+
+# https://github.com/settings/tokens/new
+#  => write:packages read:packages
+echo $GITHUB_TOKEN | docker login ghcr.io -u mxcl --password-stdin
+
+docker push ghcr.io/teaxyz/infuser:latest
+docker push ghcr.io/teaxyz/infuser:$BRANCH
+docker push ghcr.io/teaxyz/infuser:$HOST:sha-$SHA
+```
