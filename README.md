@@ -13,23 +13,22 @@ Our goal is to provide an image that is just libc and `tea` with a sensible
 
 Getting Started
 ---------------
-    export vDENO=1.23.3
-
     mkdir tea
     cd tea
     git clone https://github.com/teaxyz/cli
     git clone https://github.com/teaxyz/pantry
     git clone https://github.com/teaxyz/infuser
 
+    test -n $GITHUB_TOKEN || echo "GITHUB_TOKEN not set! b0rkage imminent!"
+
     docker build \
       --tag ghcr.io/teaxyz/infuser:latest \
       --file infuser/Dockerfile \
-      --build-arg vDENO=$vDENO \
       --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
       .
 
     docker run \
-      --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
+      --env GITHUB_TOKEN \
       --hostname tea \
       --interactive --tty \
       ghcr.io/teaxyz/infuser:latest \
@@ -50,9 +49,11 @@ Debugging is easier if you can hack using your native machine.
     docker run \
       --hostname tea \
       --interactive --tty \
-      --volume $PWD/pantry:/opt/tea.xyz/var \
-      --volume $PWD/cli:/cli \
+      --volume /opt/tea.xyz/var/www:/opt/tea.xyz/var/www \
+      --volume $PWD/pantry:/opt/tea.xyz/var/pantry \
       --volume $PWD/cli:/opt/tea.xyz/var/cli \
+      --workdir /opt/tea.xyz/var/pantry \
+      --env GITHUB_TOKEN \
       ghcr.io/teaxyz/infuser:latest \
       /bin/bash
 
@@ -87,4 +88,19 @@ echo $GITHUB_TOKEN | docker login ghcr.io -u mxcl --password-stdin
 docker push ghcr.io/teaxyz/infuser:latest
 docker push ghcr.io/teaxyz/infuser:$BRANCH
 docker push ghcr.io/teaxyz/infuser:$HOST:sha-$SHA
+```
+
+Building a Multi-arch Image
+---------------------------
+
+```sh
+cd ..
+docker buildx build \
+  --push --tag ghcr.io/teaxyz/infuser:latest \
+  --tag ghcr.io/teaxyz/infuser:$BRANCH \
+  --tag ghcr.io/teaxyz/infuser:sha-$SHA7 \
+  --platform linux/amd64,linux/arm64 \
+  --file infuser/Dockerfile \
+  --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
+  .
 ```
