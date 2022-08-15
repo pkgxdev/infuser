@@ -91,7 +91,10 @@ RUN \
   #FIXME for opening tarballs
   apt-get install --yes bzip2 xz-utils && \
   #FIXME for manipulating rpaths
-  apt-get install --yes patchelf
+  apt-get install --yes patchelf && \
+  #FIXME when we’re game, we should do this ourselves, but only for linux
+  # so probs tea.xyz/gx/ca-certificates
+  apt-get --yes install ca-certificates
 
 COPY --from=stage0 /cli /cli
 WORKDIR /cli
