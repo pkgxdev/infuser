@@ -36,9 +36,11 @@ ARG vDENO=1.23.3
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=$GITHUB_TOKEN
 
+WORKDIR /opt/tea.xyz/var/pantry
+
 COPY --from=stage0 /usr/local/bin/tea /usr/local/bin/tea
-COPY --from=stage0 /usr/local/bin/deno /opt/deno.land/v$vDENO/bin/deno
-ADD pantry /opt/tea.xyz/var/pantry
+COPY --from=stage0 /opt/deno.land /opt/deno.land
+COPY --from=stage0 /cli/src src
 
 # make tea think these are already installed
 RUN \
@@ -57,9 +59,34 @@ RUN \
 RUN apt-get update
 RUN apt-get install --yes make cmake ninja-build python3 clang perl patchelf
 
-COPY --from=stage0 /cli /cli
-WORKDIR /cli
-# ^^ because tea currently requires scripts have working directory inside $SRCROOT
+ADD pantry/projects/freedesktop.org/pkg-config   projects/freedesktop.org/pkg-config
+ADD pantry/projects/perl.org                     projects/perl.org
+ADD pantry/projects/openssl.org                  projects/openssl.org
+ADD pantry/projects/invisible-island.net/ncurses projects/invisible-island.net/ncurses
+ADD pantry/projects/zlib.net                     projects/zlib.net
+ADD pantry/projects/sourceware.org/bzip2         projects/sourceware.org/bzip2
+ADD pantry/projects/gnu.org/readline             projects/gnu.org/readline
+ADD pantry/projects/curl.se                      projects/curl.se
+ADD pantry/projects/cmake.org                    projects/cmake.org
+ADD pantry/projects/sourceware.org/libffi        projects/sourceware.org/libffi
+ADD pantry/projects/libexpat.github.io           projects/libexpat.github.io
+ADD pantry/projects/bytereef.org/mpdecimal       projects/bytereef.org/mpdecimal
+ADD pantry/projects/tukaani.org/xz               projects/tukaani.org/xz
+ADD pantry/projects/sqlite.org                   projects/sqlite.org
+ADD pantry/projects/python.org                   projects/python.org
+ADD pantry/projects/ninja-build.org              projects/ninja-build.org
+ADD pantry/projects/gnu.org/m4                   projects/gnu.org/m4
+ADD pantry/projects/rust-lang.org                projects/rust-lang.org
+ADD pantry/projects/llvm.org                     projects/llvm.org
+ADD pantry/projects/gnu.org/make                 projects/gnu.org/make
+ADD pantry/projects/deno.land                    projects/deno.land
+ADD pantry/scripts/build.ts                      scripts/build.ts
+ADD pantry/import-map.json                       import-map.json
+ADD pantry/scripts/repair.ts                     scripts
+ADD pantry/README.md                             README.md
+
+RUN mkdir .git
+# ^^ trick tea into finding SRCROOT
 
 RUN scripts/build.ts gnu.org/m4
 RUN scripts/build.ts gnu.org/make

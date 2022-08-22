@@ -96,7 +96,8 @@ Building a Multi-arch Image
 ```sh
 cd ..
 docker buildx build \
-  --push --tag ghcr.io/teaxyz/infuser:latest \
+  --pull --push \
+  --tag ghcr.io/teaxyz/infuser:latest \
   --tag ghcr.io/teaxyz/infuser:$BRANCH \
   --tag ghcr.io/teaxyz/infuser:sha-$SHA7 \
   --platform linux/amd64,linux/arm64 \
@@ -104,3 +105,41 @@ docker buildx build \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
   .
 ```
+
+Building the Multi-Arch Image (But Faster)
+==========================================
+
+It takes a very long time to build aarch64 on x86-64. So we want to build
+natively and then combine them in one step.
+
+**NOTE** you must use a precise copy of `teaxyz/cli`, `teaxyz/pantry` &
+`teaxyz/infuser` on both machines. We suggest tarring up one and transferring
+it after the first build.
+
+```sh
+# on the aarch64 machine
+DOCKER_BUILDKIT=1 docker build \
+  --tag ghcr.io/teaxyz/infuser:aarch64 \
+  --file infuser/Dockerfile \
+  --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
+  --build-arg BUILDKIT_INLINE_CACHE=1 \
+  .
+docker push ghcr.io/teaxyz/infuser:aarch64
+
+# on the x86-64 machine
+docker buildx build \
+  --pull --push \
+  --tag ghcr.io/teaxyz/infuser:latest \
+  --tag ghcr.io/teaxyz/infuser:$BRANCH \
+  --tag ghcr.io/teaxyz/infuser:sha-$SHA7 \
+  --platform linux/amd64,linux/arm64 \
+  --file infuser/Dockerfile \
+  --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
+  --cache-from ghcr.io/teaxyz/infuser:aarch64 \
+  .
+```
+
+## TODO
+
+Using `docker save`/`docker load` would be more efficient, however `buildx`
+fails to load the cache.
