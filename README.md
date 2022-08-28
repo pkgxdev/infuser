@@ -85,13 +85,18 @@ docker tag $HOST:latest $HOST:$BRANCH
 #  => write:packages read:packages
 echo $GITHUB_TOKEN | docker login ghcr.io -u mxcl --password-stdin
 
-docker push ghcr.io/teaxyz/infuser:latest
-docker push ghcr.io/teaxyz/infuser:$BRANCH
-docker push ghcr.io/teaxyz/infuser:$HOST:sha-$SHA
+docker push $HOST:latest
+docker push $HOST:$BRANCH
+docker push $HOST:sha-$SHA
 ```
 
 Building a Multi-arch Image
 ---------------------------
+
+```sh
+# first time only
+docker buildx create --name mybuilder --use
+```
 
 ```sh
 cd ..
@@ -113,33 +118,50 @@ It takes a very long time to build aarch64 on x86-64. So we want to build
 natively and then combine them in one step.
 
 **NOTE** you must use a precise copy of `teaxyz/cli`, `teaxyz/pantry` &
-`teaxyz/infuser` on both machines. We suggest tarring up one and transferring
-it after the first build.
+`teaxyz/infuser` on both machines. Use `rsync -Rav ./tea $X86_64_HOSTNAME.local:tea`.
+
+```sh
+# first time only on both machines
+<<-EOS >./buildx.cnf.toml
+[registry."$X86_64_HOSTNAME.local:5000"]
+  http = true
+  insecure = true
+EOS
+docker buildx create --name tea.builder --use --config ./buildx.cnf.toml
+
+# the config means we can run our own registry (for caching the aarch64
+# layers) without having to mess around for `https`.
+```
+
+```sh
+# run a registry on $X86_64_HOSTNAME
+docker run -d -p 5000:5000 --name registry --restart=always registry:latest
+
+# note you will need to set up your docker daemons to use insecure registries
+# see: https://www.allisonthackston.com/articles/local-docker-registry.html
+```
 
 ```sh
 # on the aarch64 machine
-DOCKER_BUILDKIT=1 docker build \
-  --tag ghcr.io/teaxyz/infuser:aarch64 \
+docker buildx build \
+  --platform linux/arm64 \
+  --tag $X86_64_HOSTNAME.local:5000/tea \
   --file infuser/Dockerfile \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
-  --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --cache-to $X86_64_HOSTNAME.local:5000/tea \
   .
-docker push ghcr.io/teaxyz/infuser:aarch64
+```
 
+```sh
 # on the x86-64 machine
 docker buildx build \
-  --pull --push \
+  --push \
   --tag ghcr.io/teaxyz/infuser:latest \
   --tag ghcr.io/teaxyz/infuser:$BRANCH \
   --tag ghcr.io/teaxyz/infuser:sha-$SHA7 \
   --platform linux/amd64,linux/arm64 \
   --file infuser/Dockerfile \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
-  --cache-from ghcr.io/teaxyz/infuser:aarch64 \
+  --cache-from $X86_64_HOSTNAME.local:5000/tea \
   .
 ```
-
-## TODO
-
-Using `docker save`/`docker load` would be more efficient, however `buildx`
-fails to load the cache.
