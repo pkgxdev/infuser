@@ -13,8 +13,8 @@ Our goal is to provide an image that is just libc and `tea` with a sensible
 
 Getting Started
 ---------------
-    mkdir tea
-    cd tea
+    mkdir ~/tea
+    cd ~/tea
     git clone https://github.com/teaxyz/cli
     git clone https://github.com/teaxyz/pantry
     git clone https://github.com/teaxyz/infuser
@@ -99,7 +99,7 @@ docker buildx create --name mybuilder --use
 ```
 
 ```sh
-cd ..
+cd ~/tea
 docker buildx build \
   --pull --push \
   --tag ghcr.io/teaxyz/infuser:latest \
@@ -117,8 +117,10 @@ Building the Multi-Arch Image (But Faster)
 It takes a very long time to build aarch64 on x86-64. So we want to build
 natively and then combine them in one step.
 
-**NOTE** you must use a precise copy of `teaxyz/cli`, `teaxyz/pantry` &
-`teaxyz/infuser` on both machines. Use `rsync -Rav ./tea $X86_64_HOSTNAME.local:tea`.
+> **NOTE** you must use a precise copy of `teaxyz/cli`, `teaxyz/pantry` &
+> `teaxyz/infuser` on both machines.
+> Use `rsync -Rav ~/tea $X86_64_HOSTNAME.local:tea`.
+> You may need to add `.git` to `~/tea/.dockerignore`.
 
 ```sh
 # first time only on both machines

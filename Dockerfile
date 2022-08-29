@@ -1,5 +1,5 @@
 FROM debian:buster-slim as stage0
-ARG vDENO=1.23.3
+ARG vDENO=1.25.0
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=$GITHUB_TOKEN
 
@@ -18,11 +18,12 @@ RUN \
     echo "Unsupported architecture: $(uname -m)"; exit 1;; \
   esac; \
   curl -Lo deno.zip "$URL"
-RUN unzip deno.zip -d /usr/local/bin
+RUN mkdir -p /opt/deno.land/v$vDENO/bin
+RUN unzip deno.zip -d /opt/deno.land/v$vDENO/bin
 
 ADD cli /cli
 
-RUN deno compile \
+RUN /opt/deno.land/v$vDENO/bin/deno compile \
   --allow-read --allow-write=/opt --allow-net --allow-run --allow-env \
   --import-map=/cli/import-map.json \
   --output /usr/local/bin/tea \
@@ -32,7 +33,6 @@ RUN deno compile \
 
 #------------------------------------------------------------------------------
 FROM debian:buster-slim as stage1
-ARG vDENO=1.23.3
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=$GITHUB_TOKEN
 
