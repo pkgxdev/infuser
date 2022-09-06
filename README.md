@@ -149,6 +149,7 @@ docker buildx build \
   --platform linux/arm64 \
   --tag $X86_64_HOSTNAME.local:5000/tea \
   --file infuser/Dockerfile \
+  --load \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
   --cache-to $X86_64_HOSTNAME.local:5000/tea \
   .
@@ -159,8 +160,8 @@ docker buildx build \
 docker buildx build \
   --push \
   --tag ghcr.io/teaxyz/infuser:latest \
-  --tag ghcr.io/teaxyz/infuser:$BRANCH \
-  --tag ghcr.io/teaxyz/infuser:sha-$SHA7 \
+  --tag ghcr.io/teaxyz/infuser:$(git branch --show-current) \
+  --tag ghcr.io/teaxyz/infuser:sha-$(git rev-parse --short HEAD) \
   --platform linux/amd64,linux/arm64 \
   --file infuser/Dockerfile \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
