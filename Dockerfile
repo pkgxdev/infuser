@@ -121,7 +121,9 @@ RUN \
   # so probs tea.xyz/gx/ca-certificates
   apt-get --yes install ca-certificates && \
   # required by build infra
-  apt-get --yes install patchelf file
+  apt-get --yes install patchelf file && \
+  # required on aarch64 by `ghcup`
+  apt-get --yes install libnuma1
 
 COPY --from=stage0 /cli /cli
 WORKDIR /cli
