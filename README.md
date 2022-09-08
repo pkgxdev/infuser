@@ -158,10 +158,10 @@ docker buildx build \
 ```sh
 # on the x86-64 machine
 docker buildx build \
-  --push \
+  --push --pull \
   --tag ghcr.io/teaxyz/infuser:latest \
-  --tag ghcr.io/teaxyz/infuser:$(git branch --show-current) \
-  --tag ghcr.io/teaxyz/infuser:sha-$(git rev-parse --short HEAD) \
+  --tag ghcr.io/teaxyz/infuser:$(git -C infuser branch --show-current) \
+  --tag ghcr.io/teaxyz/infuser:sha-$(git -C infuser rev-parse --short HEAD) \
   --platform linux/amd64,linux/arm64 \
   --file infuser/Dockerfile \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
