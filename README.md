@@ -147,11 +147,11 @@ docker run -d -p 5000:5000 --name registry --restart=always registry:latest
 # on the aarch64 machine
 docker buildx build \
   --platform linux/arm64 \
-  --tag $X86_64_HOSTNAME.local:5000/tea \
+  --tag ghcr.io/teaxyz/infuser:latest \
   --file infuser/Dockerfile \
   --load \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
-  --cache-to $X86_64_HOSTNAME.local:5000/tea \
+  --cache-to type=registry,ref=$X86_64_HOSTNAME.local:5000/tea,mode=max \
   .
 ```
 

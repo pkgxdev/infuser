@@ -26,7 +26,7 @@ ADD cli /cli
 RUN /opt/deno.land/v$vDENO/bin/deno compile \
   --allow-read --allow-write=/opt --allow-net --allow-run --allow-env \
   --import-map=/cli/import-map.json \
-  --output /usr/local/bin/tea \
+  --output /opt/tea.xyz/v0/bin/tea \
   /cli/src/app.ts
 
 
@@ -38,9 +38,10 @@ ENV GITHUB_TOKEN=$GITHUB_TOKEN
 
 WORKDIR /opt/tea.xyz/var/pantry
 
-COPY --from=stage0 /usr/local/bin/tea /usr/local/bin/tea
-COPY --from=stage0 /opt/deno.land /opt/deno.land
+COPY --from=stage0 /opt /opt
 COPY --from=stage0 /cli/src src
+
+RUN ln -s /opt/tea.xyz/v0/bin/tea /usr/local/bin/tea
 
 # make tea think these are already installed
 RUN \
@@ -102,17 +103,16 @@ RUN cd /opt && rm -rf \
   gnu.org/m4
 
 RUN find /opt -name src | xargs rm -rf
-RUN rm -rf /opt/tea.xyz
+RUN rm -rf /opt/tea.xyz/var/www
 
 
 #------------------------------------------------------------------------------
 FROM debian:buster-slim as stage2
 
-COPY --from=stage1 /usr/local/bin/tea /usr/local/bin/tea
 COPY --from=stage1 /opt /opt
-ADD pantry /opt/tea.xyz/var/pantry
 
 RUN \
+  ln -s /opt/tea.xyz/v0/bin/tea /usr/local/bin/tea && \
   apt-get update && \
   apt-get install --yes libc-dev libstdc++-8-dev libgcc-8-dev && \
   #FIXME for opening tarballs
@@ -121,7 +121,3 @@ RUN \
   apt-get --yes install patchelf file && \
   # required on aarch64 by `ghcup`
   apt-get --yes install libnuma1
-
-COPY --from=stage0 /cli /cli
-WORKDIR /cli
-# ^^ because tea currently requires scripts have working directory inside $SRCROOT
