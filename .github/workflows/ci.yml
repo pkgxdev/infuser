@@ -1,0 +1,9 @@
+on:
+  pull_request:
+
+jobs:
+  direct:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ludeeus/action-shellcheck@1.1.0
