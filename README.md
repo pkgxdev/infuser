@@ -172,3 +172,24 @@ docker buildx build \
 Note that the image will be on GitHub but *not* your local docker. lol.
 Docker is a mess. Supposedly replacing ``-push` with `--output=docker` would
 fix this but for me: it did nothing.
+
+Cross-running multi-arch images
+===============================
+
+If you're even crazier, you can run the alternate architectures using docker's QEMU emulation:
+
+(N.B. This will be slow.)
+
+```sh
+docker run \
+  --hostname tea \
+  --interactive --tty \
+  --volume /opt/tea.xyz/var/www:/opt/tea.xyz/var/www \
+  --volume $PWD/pantry:/opt/tea.xyz/var/pantry \
+  --volume $PWD/cli:/opt/tea.xyz/var/cli \
+  --workdir /opt/tea.xyz/var/pantry \
+  --platform linux/amd64 \
+  --env GITHUB_TOKEN \
+  ghcr.io/teaxyz/infuser:latest \
+  /bin/bash
+```
