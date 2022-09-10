@@ -22,13 +22,17 @@ RUN mkdir -p /opt/deno.land/v$vDENO/bin
 RUN unzip deno.zip -d /opt/deno.land/v$vDENO/bin
 
 ADD cli /cli
+WORKDIR cli
 
 RUN /opt/deno.land/v$vDENO/bin/deno compile \
   --allow-read --allow-write=/opt --allow-net --allow-run --allow-env \
   --import-map=/cli/import-map.json \
-  --output /opt/tea.xyz/v0/bin/tea \
-  /cli/src/app.ts
+  --output tea \
+  src/app.ts
 
+RUN source <(./tea -Eds) \
+ && /bin/mkdir -p /opt/tea.xyz/v$VERSION/bin \
+ && /bin/mv tea /opt/tea.xyz/v$VERSION/bin
 
 
 #------------------------------------------------------------------------------
@@ -41,7 +45,7 @@ WORKDIR /opt/tea.xyz/var/pantry
 COPY --from=stage0 /opt /opt
 COPY --from=stage0 /cli/src src
 
-RUN ln -s /opt/tea.xyz/v0/bin/tea /usr/local/bin/tea
+RUN ln -s /opt/tea.xyz/v*/bin/tea /usr/local/bin/tea
 
 # make tea think these are already installed
 RUN \
@@ -92,7 +96,7 @@ RUN mkdir .git
 RUN scripts/build.ts gnu.org/m4
 RUN scripts/build.ts gnu.org/make
 RUN scripts/build.ts llvm.org
-RUN scripts/repair.ts deno.land
+RUN scripts/repair.ts deno.land tea.xyz
 
 RUN cd /opt && rm -rf \
   llvm.org/v14.0.0 \
