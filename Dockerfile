@@ -55,6 +55,9 @@ RUN \
     python.org/v3.0.0 \
     cmake.org/v3.0.0 \
     ninja-build.org/v1.0.0 \
+    curl.se/v6.0.0 \
+    openssl.org/v1.1.0 \
+    perl.org/v5.0.0 \
     ; \
   do \
     mkdir -p /opt/$x; \
@@ -62,7 +65,7 @@ RUN \
   done
 
 RUN apt-get update
-RUN apt-get install --yes make cmake ninja-build python3 clang perl patchelf
+RUN apt-get install --yes make cmake ninja-build python3 clang perl patchelf curl
 
 ADD pantry/projects/freedesktop.org/pkg-config   projects/freedesktop.org/pkg-config
 ADD pantry/projects/perl.org                     projects/perl.org
@@ -96,6 +99,8 @@ RUN mkdir .git
 RUN scripts/build.ts gnu.org/m4
 RUN scripts/build.ts gnu.org/make
 RUN scripts/build.ts llvm.org
+RUN scripts/build.ts openssl.org
+RUN scripts/build.ts curl.se
 RUN scripts/repair.ts deno.land tea.xyz
 
 RUN cd /opt && rm -rf \
@@ -104,7 +109,10 @@ RUN cd /opt && rm -rf \
   python.org \
   cmake.org \
   ninja-build.org \
-  gnu.org/m4
+  gnu.org/m4 \
+  curl.se/v6.0.0 \
+  openssl.org/v1.1.0 \
+  perl.org
 
 RUN find /opt -name src | xargs rm -rf
 RUN rm -rf /opt/tea.xyz/var/www

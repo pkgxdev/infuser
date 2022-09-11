@@ -103,7 +103,7 @@ cd ~/tea
 docker buildx build \
   --pull --push \
   --tag ghcr.io/teaxyz/infuser:latest \
-  --tag ghcr.io/teaxyz/infuser::$(git -C infuser branch --show-current) \
+  --tag ghcr.io/teaxyz/infuser:$(git -C infuser branch --show-current) \
   --tag ghcr.io/teaxyz/infuser:sha-$(git -C infuser rev-parse --short HEAD) \
   --platform linux/amd64,linux/arm64 \
   --file infuser/Dockerfile \
