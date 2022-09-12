@@ -168,3 +168,7 @@ docker buildx build \
   --cache-from $X86_64_HOSTNAME.local:5000/tea \
   .
 ```
+
+Note that the image will be on GitHub but *not* your local docker. lol.
+Docker is a mess. Supposedly replacing ``-push` with `--output=docker` would
+fix this but for me: it did nothing.

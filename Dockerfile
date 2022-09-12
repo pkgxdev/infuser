@@ -32,8 +32,8 @@ RUN /opt/deno.land/v$vDENO/bin/deno compile \
 
 RUN source <(./tea -Eds) \
  && /bin/mkdir -p /opt/tea.xyz/v$VERSION/bin \
- && /bin/mv tea /opt/tea.xyz/v$VERSION/bin
-
+ && /bin/mv tea /opt/tea.xyz/v$VERSION/bin \
+ && cd /opt/tea.xyz && /bin/ln -s v$VERSION 'v*'
 
 #------------------------------------------------------------------------------
 FROM debian:buster-slim as stage1
@@ -45,7 +45,7 @@ WORKDIR /opt/tea.xyz/var/pantry
 COPY --from=stage0 /opt /opt
 COPY --from=stage0 /cli/src src
 
-RUN ln -s /opt/tea.xyz/v*/bin/tea /usr/local/bin/tea
+RUN ln -s /opt/tea.xyz/'v*'/bin/tea /usr/local/bin/tea
 
 # make tea think these are already installed
 RUN \
@@ -122,9 +122,10 @@ RUN rm -rf /opt/tea.xyz/var/www
 FROM debian:buster-slim as stage2
 
 COPY --from=stage1 /opt /opt
+ADD pantry /opt/tea.xyz/var/pantry
 
 RUN \
-  ln -s /opt/tea.xyz/v0/bin/tea /usr/local/bin/tea && \
+  ln -s /opt/tea.xyz/v'*'/bin/tea /usr/local/bin/tea && \
   apt-get update && \
   apt-get install --yes libc-dev libstdc++-8-dev libgcc-8-dev && \
   #FIXME for opening tarballs
