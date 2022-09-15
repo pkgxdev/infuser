@@ -18,6 +18,9 @@ git pull --rebase
 
 eval "$(grep ^GITHUB_TOKEN= ~/docker.env.tea)"
 
+#FIXME MUCH: Docker "Desktop" requires keychain access to `docker login`
+security unlock-keychain -p "$(cat ~/.p)"
+
 echo "$GITHUB_TOKEN" | docker login ghcr.io -u jhheider --password-stdin
 
 /usr/local/bin/docker buildx build \

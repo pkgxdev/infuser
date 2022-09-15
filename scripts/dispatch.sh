@@ -7,7 +7,6 @@ ENV_FILE=~/docker.env.tea
 DOCKER=/Applications/Docker.app/Contents/Resources/bin/docker
 TEA_VAR=${TEA_PREFIX:=/opt}/tea.xyz/var
 
-
 if ! shlock -f "$LOCKFILE" -p $$; then
   exit
 fi
@@ -17,8 +16,12 @@ trap "rm \\"$LOCKFILE\\"" EXIT
 function update_from_git() {
   git reset --hard
   git fetch origin
-  git checkout main
-  git pull --rebase
+  if test $# -eq 0; then
+    git checkout main
+    git pull --rebase
+  else
+    git checkout "$1"
+  fi
 }
 
 ## BEGIN
@@ -26,23 +29,39 @@ set -a
 # shellcheck source=/dev/null
 . $ENV_FILE
 
-PACKAGE=$(curl -s https://app.tea.xyz/api/builder/nextJob -H "authorization: bearer $TEA_API_TOKEN" | \
- sed -e 's/{"project":"\(.*\)","version":"\(.*\)"}/\1 \2/' -e 's/ \*$//')
+R=$(curl -s https://app.tea.xyz/api/builder/nextJob -H "authorization: bearer $TEA_API_TOKEN" | \
+ sed -e 's/{"project":"\(.*\)","version":"\(.*\)","sha":"\(.*\)"}/\1 \2 \3/' -e 's/ \*$//')
+
+PACKAGE=$(echo $R | cut -d ' ' -f 1-2)
+SHA=$(echo $R | cut -d ' ' -f 3)
 
 if test -z "$PACKAGE"; then
   exit 0
 fi
 
+if test -z "$SHA"; then
+  echo "SHA missing"
+  exit 1
+fi
+
 cd $TEA_VAR/cli
 update_from_git
 cd $TEA_VAR/pantry
-update_from_git
+update_from_git "$SHA"
 
 # shellcheck disable=SC2086
 $TEA_VAR/infuser/scripts/build-test-bottle-upload.sh $PACKAGE >$TEA_VAR/log/build-log-aarch64.log 2>&1
 
+#HACKY: Docker Desktop _really_ wants to use the macOS keychain
+HASH=$(echo -n "$GITHUB_USER:$GITHUB_TOKEN" | base64)
+
+echo '{"auths":{"ghcr.io":{"auth":"'"$HASH"'"}}}' >~/.docker/config.json
+
+$DOCKER login ghcr.io
+$DOCKER pull ghcr.io/teaxyz/infuser:latest
 $DOCKER container prune --force
 
+#FIXME: linux-aarch64 needs OS ca-certificates right now.
 # shellcheck disable=SC2086
 $DOCKER run \
   --hostname tea \
@@ -52,7 +71,7 @@ $DOCKER run \
   --workdir $TEA_VAR/pantry \
   --env-file ~/docker.env.tea \
   ghcr.io/teaxyz/infuser:latest \
-  $TEA_VAR/infuser/scripts/build-test-bottle-upload.sh $PACKAGE \
+  bash -c "apt-get install -y ca-certificates && $TEA_VAR/infuser/scripts/build-test-bottle-upload.sh $PACKAGE" \
   >$TEA_VAR/log/build-log-x86_64.log 2>&1
 
 #TODO: add slack notification
