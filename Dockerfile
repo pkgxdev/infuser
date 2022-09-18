@@ -44,6 +44,7 @@ WORKDIR /opt/tea.xyz/var/pantry
 
 COPY --from=stage0 /opt /opt
 COPY --from=stage0 /cli/src src
+COPY --from=stage0 /cli /cli
 
 RUN ln -s /opt/tea.xyz/'v*'/bin/tea /usr/local/bin/tea
 
@@ -90,7 +91,7 @@ ADD pantry/projects/gnu.org/make                 projects/gnu.org/make
 ADD pantry/projects/deno.land                    projects/deno.land
 ADD pantry/scripts/build.ts                      scripts/build.ts
 ADD pantry/import-map.json                       import-map.json
-ADD pantry/scripts/repair.ts                     scripts
+ADD cli/scripts/repair.ts                        scripts
 ADD pantry/README.md                             README.md
 
 RUN mkdir .git
