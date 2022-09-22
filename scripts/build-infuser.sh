@@ -2,6 +2,13 @@
 
 set -euxo pipefail
 
+function update_from_git() {
+  git -C "$1" reset --hard
+  git -C "$1" fetch origin
+  git -C "$1" checkout main
+  git -C "$1" pull --rebase
+}
+
 if test ! -d /opt/tea.xyz/var/infuser -o ! -d /opt/tea.xyz/var/cli -o ! -d /opt/tea.xyz/var/pantry; then
   echo "Missing one of the three required repositories"
   exit 1
@@ -9,10 +16,9 @@ fi
 
 cd /opt/tea.xyz/var
 
-git -C infuser reset --hard
-git -C infuser fetch origin
-git -C infuser checkout main
-git -C infuser pull --rebase
+update_from_git infuser
+update_from_git cli
+update_from_git pantry
 
 # shellcheck source=/dev/null
 . ~/docker.env.tea
