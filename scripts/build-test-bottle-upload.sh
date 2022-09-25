@@ -26,7 +26,7 @@ REQS=$(GITHUB_ACTIONS=1 ./scripts/sort.ts "$PACKAGE_SPEC" | sed -ne 's/::set-out
 if test ! -z "$REQS"; then
   # shellcheck disable=SC2086
   # We want to split on spaces here
-  ../cli/scripts/install.ts $REQS
+  echo $REQS | xargs ../cli/scripts/install.ts
 fi
 
 BUILT=$(./scripts/build.ts "$PACKAGE_SPEC" | sed -ne 's/::set-output name=pkgs:://p')
