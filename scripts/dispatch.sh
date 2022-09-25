@@ -50,7 +50,7 @@ cd $TEA_VAR/pantry
 update_from_git "$SHA"
 
 # shellcheck disable=SC2086
-$TEA_VAR/infuser/scripts/build-test-bottle-upload.sh $PACKAGE >>$TEA_VAR/log/build-log-aarch64.log 2>&1
+$TEA_VAR/infuser/scripts/build-test-bottle-upload.sh $PACKAGE >>$TEA_VAR/log/build-log-darwin.log 2>&1
 
 #HACKY: Docker Desktop _really_ wants to use the macOS keychain
 HASH=$(echo -n "$GITHUB_USER:$GITHUB_TOKEN" | base64)
@@ -72,6 +72,6 @@ $DOCKER run \
   --env-file ~/docker.env.tea \
   ghcr.io/teaxyz/infuser:latest \
   bash -c "apt-get install -y ca-certificates && $TEA_VAR/infuser/scripts/build-test-bottle-upload.sh $PACKAGE" \
-  >>$TEA_VAR/log/build-log-x86_64.log 2>&1
+  >>$TEA_VAR/log/build-log-linux.log 2>&1
 
 #TODO: add slack notification
