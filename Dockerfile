@@ -1,5 +1,5 @@
 FROM debian:buster-slim as stage0
-ARG vDENO=1.25.0
+ARG vDENO=1.25.3
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=$GITHUB_TOKEN
 
@@ -30,6 +30,7 @@ RUN /opt/deno.land/v$vDENO/bin/deno compile \
   --output tea \
   src/app.ts
 
+#FIXME: $VERSION not currently being set.
 RUN source <(./tea -Eds) \
   && /bin/mkdir -p /opt/tea.xyz/v$VERSION/bin \
   && /bin/mv tea /opt/tea.xyz/v$VERSION/bin \
@@ -142,7 +143,7 @@ ADD pantry/projects/gnome.org/libxml2            projects/gnome.org/libxml2
 RUN scripts/build.ts gnome.org/libxml2
 
 # gnu.org/gettext
-ADD pantry/projects/gnu.org/gettext                 projects/gnu.org/gettext
+ADD pantry/projects/gnu.org/gettext              projects/gnu.org/gettext
 RUN scripts/build.ts gnu.org/gettext
 
 # git-scm.org
@@ -156,6 +157,10 @@ RUN scripts/build.ts openssl.org
 
 # curl.se
 RUN scripts/build.ts curl.se
+
+# tea.xyz
+ADD pantry/projects/tea.xyz                      projects/tea.xyz
+RUN scripts/build.ts tea.xyz
 
 RUN scripts/repair.ts deno.land tea.xyz
 
