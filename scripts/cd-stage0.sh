@@ -14,8 +14,8 @@ fi
 trap "rm \\"$LOCKFILE\\"" EXIT
 
 function update_from_git() {
-  git reset --hard
-  git fetch origin
+  git fetch --all
+  git reset --hard origin/main
   if test $# -eq 0; then
     git checkout main
     git pull --rebase

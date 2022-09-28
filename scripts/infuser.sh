@@ -6,7 +6,7 @@ function update_from_git() {
   git -C "$1" reset --hard
   git -C "$1" fetch origin
   git -C "$1" checkout main
-  git -C "$1" pull --rebase
+  git -C "$1" pull --all
 }
 
 if test ! -d /opt/tea.xyz/var/infuser -o ! -d /opt/tea.xyz/var/cli -o ! -d /opt/tea.xyz/var/pantry; then
