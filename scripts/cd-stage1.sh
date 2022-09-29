@@ -36,8 +36,11 @@ BUILT=$(./scripts/build.ts "$PACKAGE_SPEC" | sed -ne 's/::set-output name=pkgs::
 for PKG in $BUILT; do
   ./scripts/test.ts "$PKG"
 
-  FILES=$(./scripts/bottle.ts "$PKG" | sed -ne 's/::set-output name=bottles::/--bottles /p' -e 's/::set-output name=checksums::/--checksums /p')
+  for COMPRESSION in gz xz; do
+    export COMPRESSION
+    FILES=$(./scripts/bottle.ts "$PKG" | sed -ne 's/::set-output name=bottles::/--bottles /p' -e 's/::set-output name=checksums::/--checksums /p')
 
-  # shellcheck disable=SC2086
-  echo --pkgs $BUILT $FILES | xargs ./scripts/upload.ts
+    # shellcheck disable=SC2086
+    echo --pkgs $BUILT $FILES | xargs ./scripts/upload.ts
+  done
 done
