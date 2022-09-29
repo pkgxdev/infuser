@@ -62,6 +62,7 @@ $DOCKER pull ghcr.io/teaxyz/infuser:latest
 $DOCKER container prune --force
 
 #FIXME: linux-aarch64 needs OS ca-certificates right now.
+#FIXME: linux-aarch64 needs OS shared-mime-info right now.
 # shellcheck disable=SC2086
 $DOCKER run \
   --hostname tea \
@@ -71,7 +72,7 @@ $DOCKER run \
   --workdir $TEA_VAR/pantry \
   --env-file ~/docker.env.tea \
   ghcr.io/teaxyz/infuser:latest \
-  bash -c "apt-get install -y ca-certificates && $TEA_VAR/infuser/scripts/cd-stage1.sh $PACKAGE" \
+  bash -c "apt-get install -y shared-mime-info ca-certificates && $TEA_VAR/infuser/scripts/cd-stage1.sh $PACKAGE" \
   >>$TEA_VAR/log/build-log-linux.log 2>&1
 
 #TODO: add slack notification
