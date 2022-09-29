@@ -195,4 +195,6 @@ RUN \
   # required by build infra
   apt-get --yes install patchelf file && \
   # required on aarch64 by `ghcup`
-  apt-get --yes install libnuma1
+  apt-get --yes install libnuma1 && \
+  # required to build gnome.org/gdk-pixbuf
+  apt-get --yes install shared-mime-info
