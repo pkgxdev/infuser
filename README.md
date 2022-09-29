@@ -193,3 +193,16 @@ docker run \
   ghcr.io/teaxyz/infuser:latest \
   /bin/bash
 ```
+
+
+# `infuser:slim`
+
+```sh
+docker buildx build \
+  --pull --push \
+  --tag ghcr.io/teaxyz/infuser:slim \
+  --platform linux/amd64,linux/arm64 \
+  --file infuser/Dockerfile.slim \
+  --build-arg TEA_SECRET=$TEA_SECRET \
+  .
+```
