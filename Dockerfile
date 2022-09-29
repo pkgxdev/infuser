@@ -75,6 +75,7 @@ ADD pantry/scripts/build/fix-pkg-config-files.ts scripts/build/fix-pkg-config-fi
 ADD pantry/scripts/build/fix-linux-rpaths.ts     scripts/build/fix-linux-rpaths.ts
 ADD pantry/scripts/build/build.ts                scripts/build/build.ts
 ADD pantry/scripts/build.ts                      scripts/build.ts
+ADD pantry/scripts/utils/gha.ts                  scripts/utils/gha.ts
 ADD pantry/import-map.json                       import-map.json
 ADD cli/scripts/repair.ts                        scripts
 ADD pantry/README.md                             README.md
