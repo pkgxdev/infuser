@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+DOCKER=/usr/local/bin/docker
+
 function update_from_git() {
   git -C "$1" reset --hard
   git -C "$1" fetch origin
@@ -28,9 +30,19 @@ HASH=$(echo -n "$GITHUB_USER:$GITHUB_TOKEN" | base64)
 
 echo '{"auths":{"ghcr.io":{"auth":"'"$HASH"'"}}}' >~/.docker/config.json
 
-/usr/local/bin/docker login ghcr.io
+$DOCKER login ghcr.io
 
-/usr/local/bin/docker buildx build \
+$DOCKER buildx build \
+  --pull --push \
+  --tag ghcr.io/teaxyz/infuser:slim \
+  --tag ghcr.io/teaxyz/infuser:slim-sha-"$(git -C infuser rev-parse --short HEAD)" \
+  --tag ghcr.io/teaxyz/infuser:slim-nightly-"$(date +%F)" \
+  --platform linux/amd64,linux/arm64 \
+  --file infuser/Dockerfile.slim \
+  --build-arg TEA_SECRET="$TEA_SECRET" \
+  .
+
+$DOCKER buildx build \
   --pull --push \
   --tag ghcr.io/teaxyz/infuser:latest \
   --tag ghcr.io/teaxyz/infuser:"$(git -C infuser branch --show-current)" \
