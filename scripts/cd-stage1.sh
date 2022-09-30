@@ -18,6 +18,15 @@ else
   PACKAGE_SPEC=$1@$2
 fi
 
+if test -f /usr/bin/aws; then
+  AWS=/usr/bin/aws
+elif test -f /usr/local/bin/aws; then
+  AWS=/usr/local/bin/aws
+else
+  echo "aws cli not found. exiting."
+  exit 1
+fi
+
 # Make sure `tea` is in our PATH
 PATH=$PATH:~/.tea/tea.xyz/v'*'/bin
 
@@ -41,6 +50,11 @@ for PKG in $BUILT; do
     FILES=$(./scripts/bottle.ts "$PKG" | sed -ne 's/::set-output name=bottles::/--bottles /p' -e 's/::set-output name=checksums::/--checksums /p')
 
     # shellcheck disable=SC2086
-    echo --pkgs $BUILT $FILES | xargs ./scripts/upload.ts
+    CF=$(echo --pkgs $BUILT $FILES | xargs ./scripts/upload.ts | sed -ne 's/::set-output name=cf-invalidation-paths:://p')
+    # echo --pkgs $BUILT $FILES | xargs ./scripts/upload.ts
+
+    echo "$CF" | xargs $AWS cloudfront create-invalidation \
+      --distribution-id "$AWS_CF_DISTRIBUTION_ID" \
+      --paths
   done
 done

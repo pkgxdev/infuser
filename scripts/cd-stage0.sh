@@ -72,7 +72,7 @@ $DOCKER run \
   --workdir $TEA_VAR/pantry \
   --env-file ~/docker.env.tea \
   ghcr.io/teaxyz/infuser:latest \
-  bash -c "apt-get install -y shared-mime-info ca-certificates && $TEA_VAR/infuser/scripts/cd-stage1.sh $PACKAGE" \
+  bash -c "apt-get install -y shared-mime-info ca-certificates awscli && $TEA_VAR/infuser/scripts/cd-stage1.sh $PACKAGE" \
   >>$TEA_VAR/log/build-log-linux.log 2>&1
 
 #TODO: add slack notification
