@@ -35,6 +35,7 @@ $DOCKER login ghcr.io
 $DOCKER buildx build \
   --pull --push \
   --tag ghcr.io/teaxyz/infuser:slim \
+  --tag ghcr.io/teaxyz/infuser:slim-latest \
   --tag ghcr.io/teaxyz/infuser:slim-sha-"$(git -C infuser rev-parse --short HEAD)" \
   --tag ghcr.io/teaxyz/infuser:slim-nightly-"$(date +%F)" \
   --platform linux/amd64,linux/arm64 \
