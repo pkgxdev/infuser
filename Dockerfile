@@ -75,7 +75,8 @@ ADD pantry/scripts/build/fix-pkg-config-files.ts scripts/build/fix-pkg-config-fi
 ADD pantry/scripts/build/fix-linux-rpaths.ts     scripts/build/fix-linux-rpaths.ts
 ADD pantry/scripts/build/build.ts                scripts/build/build.ts
 ADD pantry/scripts/build.ts                      scripts/build.ts
-ADD pantry/scripts/utils/gha.ts                  scripts/utils/gha.ts
+ADD pantry/scripts/brewkit                       scripts/brewkit
+ADD pantry/scripts/utils                         scripts/utils
 ADD pantry/import-map.json                       import-map.json
 ADD cli/scripts/repair.ts                        scripts
 ADD pantry/README.md                             README.md
@@ -85,7 +86,10 @@ RUN mkdir .git
 
 # gnu.org/m4
 ADD pantry/projects/gnu.org/m4                   projects/gnu.org/m4
+ADD pantry/projects/sourceware.org/bzip2         projects/sourceware.org/bzip2
+ADD pantry/projects/tukaani.org/xz               projects/tukaani.org/xz
 ADD pantry/projects/gnu.org/make                 projects/gnu.org/make
+ADD pantry/projects/gnu.org/tar                  projects/gnu.org/tar
 RUN scripts/build.ts gnu.org/m4
 
 # gnu.org/make
@@ -108,7 +112,6 @@ ADD pantry/projects/zlib.net                     projects/zlib.net
 RUN scripts/build.ts zlib.net
 
 # sourceware.org/bzip2
-ADD pantry/projects/sourceware.org/bzip2         projects/sourceware.org/bzip2
 RUN scripts/build.ts sourceware.org/bzip2
 
 # sourceware.org/libffi
@@ -124,7 +127,6 @@ ADD pantry/projects/bytereef.org/mpdecimal       projects/bytereef.org/mpdecimal
 RUN scripts/build.ts bytereef.org/mpdecimal
 
 # tukaani.org/xz
-ADD pantry/projects/tukaani.org/xz               projects/tukaani.org/xz
 RUN scripts/build.ts tukaani.org/xz
 
 # sqlite.org
@@ -133,10 +135,10 @@ RUN scripts/build.ts sqlite.org
 
 # llvm.org
 ADD pantry/projects/cmake.org                    projects/cmake.org
-ADD pantry/projects/curl.se                      projects/curl.se
-ADD pantry/projects/openssl.org                  projects/openssl.org
 ADD pantry/projects/ninja-build.org              projects/ninja-build.org
+ADD pantry/projects/openssl.org                  projects/openssl.org
 ADD pantry/projects/python.org                   projects/python.org
+ADD pantry/projects/curl.se                      projects/curl.se
 RUN scripts/build.ts llvm.org
 
 # gnome.org/libxml2
@@ -150,7 +152,6 @@ RUN scripts/build.ts gnu.org/gettext
 # git-scm.org
 ADD pantry/projects/git-scm.org                  projects/git-scm.org
 ADD pantry/projects/perl.org                     projects/perl.org
-ADD pantry/scripts/brewkit/fix-shebangs.ts       scripts/brewkit/fix-shebangs.ts
 RUN scripts/build.ts git-scm.org
 
 # openssl.org
