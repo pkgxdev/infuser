@@ -30,10 +30,10 @@ set -a
 . $ENV_FILE
 
 R=$(curl -s https://app.tea.xyz/api/builder/nextJob -H "authorization: bearer $TEA_API_TOKEN" | \
- sed -e 's/{"project":"\(.*\)","version":"\(.*\)","sha":"\(.*\)"}/\1 \2 \3/' -e 's/ \*$//')
+ sed -e 's/{"project":"\(.*\)","version":"\(.*\)","sha":"\(.*\)"}/\1@\2 \3/' -e 's/@\* / /g')
 
-PACKAGE=$(echo "$R" | cut -d ' ' -f 1-2)
-SHA=$(echo "$R" | cut -d ' ' -f 3)
+PACKAGE=$(echo "$R" | cut -d ' ' -f 1)
+SHA=$(echo "$R" | cut -d ' ' -f 2)
 
 if test -z "$PACKAGE"; then
   exit 0

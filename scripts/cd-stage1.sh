@@ -12,12 +12,6 @@ if test -d $TEA_PREFIX/tea.xyz/var/www; then
   find $TEA_PREFIX/tea.xyz/var/www/ -type f -exec rm {} \;
 fi
 
-if test $# -eq 1; then
-  PACKAGE_SPEC=$1
-else
-  PACKAGE_SPEC=$1@$2
-fi
-
 if test -f /usr/bin/aws; then
   AWS=/usr/bin/aws
 elif test -f /usr/local/bin/aws; then
@@ -29,6 +23,8 @@ fi
 
 # Make sure `tea` is in our PATH
 PATH=$PATH:~/.tea/tea.xyz/v'*'/bin
+
+PACKAGE_SPEC=$1
 
 REQS=$(GITHUB_ACTIONS=1 ./scripts/sort.ts "$PACKAGE_SPEC" | sed -ne 's/::set-output name=pre-install:://p')
 
