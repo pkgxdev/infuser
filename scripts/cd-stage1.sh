@@ -34,7 +34,10 @@ if test ! -z "$REQS"; then
   echo $REQS | xargs ../cli/scripts/install.ts
 fi
 
-BUILT=$(./scripts/build.ts "$PACKAGE_SPEC" | sed -ne 's/::set-output name=pkgs:://p')
+OUT=$(./scripts/build.ts "$PACKAGE_SPEC")
+
+BUILT=$(echo "$OUT" | sed -ne 's/::set-output name=pkgs:://p')
+SRCS=$(echo "$OUT" | sed -ne 's/::set-output name=srcs:://p')
 
 # As designed, there will only be one package built per invocation,
 # but that's no reason to assume it will always be that way.
@@ -43,11 +46,13 @@ for PKG in $BUILT; do
 
   for COMPRESSION in gz xz; do
     export COMPRESSION
-    FILES=$(./scripts/bottle.ts "$PKG" | sed -ne 's/::set-output name=bottles::/--bottles /p' -e 's/::set-output name=checksums::/--checksums /p')
+
+    OUT=$(./scripts/bottle.ts "$PKG")
+    BOTTLES=$(echo "$OUT" | sed -ne 's/::set-output name=bottles:://p')
+    CHECKSUMS=$(echo "$OUT" | sed -ne 's/::set-output name=checksums:://p')
 
     # shellcheck disable=SC2086
-    CF=$(echo --pkgs $BUILT $FILES | xargs ./scripts/upload.ts | sed -ne 's/::set-output name=cf-invalidation-paths:://p')
-    # echo --pkgs $BUILT $FILES | xargs ./scripts/upload.ts
+    CF=$(echo --pkgs $BUILT --srcs $SRCS --bottles $BOTTLES --checksums $CHECKSUMS | xargs ./scripts/upload.ts | sed -ne 's/::set-output name=cf-invalidation-paths:://p')
 
     echo "$CF" | xargs $AWS cloudfront create-invalidation \
       --distribution-id "$AWS_CF_DISTRIBUTION_ID" \
