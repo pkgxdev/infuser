@@ -71,11 +71,9 @@ RUN apt-get install --yes make cmake ninja-build python3 clang perl patchelf cur
 
 ADD pantry/projects/llvm.org                     projects/llvm.org
 ADD pantry/projects/deno.land                    projects/deno.land
-ADD pantry/scripts/build/fix-pkg-config-files.ts scripts/build/fix-pkg-config-files.ts
-ADD pantry/scripts/build/fix-linux-rpaths.ts     scripts/build/fix-linux-rpaths.ts
-ADD pantry/scripts/build/build.ts                scripts/build/build.ts
 ADD pantry/scripts/build.ts                      scripts/build.ts
 ADD pantry/scripts/brewkit                       scripts/brewkit
+ADD pantry/scripts/build                         scripts/build
 ADD pantry/scripts/utils                         scripts/utils
 ADD pantry/import-map.json                       import-map.json
 ADD cli/scripts/repair.ts                        scripts
@@ -87,9 +85,12 @@ RUN mkdir .git
 # gnu.org/m4
 ADD pantry/projects/gnu.org/m4                   projects/gnu.org/m4
 ADD pantry/projects/sourceware.org/bzip2         projects/sourceware.org/bzip2
+ADD pantry/projects/darwinsys.com/file           projects/darwinsys.com/file
+ADD pantry/projects/nixos.org/patchelf           projects/nixos.org/patchelf
 ADD pantry/projects/tukaani.org/xz               projects/tukaani.org/xz
 ADD pantry/projects/gnu.org/make                 projects/gnu.org/make
 ADD pantry/projects/gnu.org/tar                  projects/gnu.org/tar
+ADD pantry/projects/zlib.net                     projects/zlib.net
 RUN scripts/build.ts gnu.org/m4
 
 # gnu.org/make
@@ -108,7 +109,6 @@ ADD pantry/projects/gnu.org/readline             projects/gnu.org/readline
 RUN scripts/build.ts gnu.org/readline
 
 # zlib.net
-ADD pantry/projects/zlib.net                     projects/zlib.net
 RUN scripts/build.ts zlib.net
 
 # sourceware.org/bzip2
