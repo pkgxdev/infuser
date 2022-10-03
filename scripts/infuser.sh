@@ -41,6 +41,7 @@ $DOCKER buildx build \
   --platform linux/amd64,linux/arm64 \
   --file infuser/Dockerfile.slim \
   --build-arg TEA_SECRET="$TEA_SECRET" \
+  --progress=plain \
   .
 
 $DOCKER buildx build \
