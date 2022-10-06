@@ -22,7 +22,7 @@ else
 fi
 
 # Make sure `tea` is in our PATH
-PATH=$PATH:~/.tea/tea.xyz/v'*'/bin
+PATH=$PATH:$TEA_PREFIX/tea.xyz/v'*'/bin
 
 PACKAGE_SPEC=$1
 
