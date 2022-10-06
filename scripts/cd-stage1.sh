@@ -7,7 +7,7 @@ export TEA_PREFIX=${TEA_PREFIX:=/opt}
 cd $TEA_PREFIX/tea.xyz/var/pantry
 
 ## Ensure clean environments
-find $TEA_PREFIX -maxdepth 1 -mindepth 1 -type d ! -name tea.xyz ! -name aws -exec rm -rf {} \;
+find $TEA_PREFIX -maxdepth 1 -mindepth 1 -type d ! -name tea.xyz ! -name aws ! -name deno.land -exec rm -rf {} \;
 if test -d $TEA_PREFIX/tea.xyz/var/www; then
   find $TEA_PREFIX/tea.xyz/var/www/ -type f -exec rm {} \;
 fi
