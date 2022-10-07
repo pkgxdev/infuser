@@ -44,14 +44,18 @@ $DOCKER buildx build \
   --progress=plain \
   .
 
-$DOCKER buildx build \
-  --pull --push \
-  --tag ghcr.io/teaxyz/infuser:latest \
-  --tag ghcr.io/teaxyz/infuser:"$(git -C infuser branch --show-current)" \
-  --tag ghcr.io/teaxyz/infuser:sha-"$(git -C infuser rev-parse --short HEAD)" \
-  --tag ghcr.io/teaxyz/infuser:nightly-"$(date +%F)" \
-  --platform linux/amd64,linux/arm64 \
-  --file infuser/Dockerfile \
-  --build-arg GITHUB_TOKEN="$GITHUB_TOKEN" \
-  --progress=plain \
-  .
+# Disable for now (slim is sufficing)
+# we can revisit if it's useful later, rather than spending
+# time and electricty debugging it now.
+
+# $DOCKER buildx build \
+#   --pull --push \
+#   --tag ghcr.io/teaxyz/infuser:latest \
+#   --tag ghcr.io/teaxyz/infuser:"$(git -C infuser branch --show-current)" \
+#   --tag ghcr.io/teaxyz/infuser:sha-"$(git -C infuser rev-parse --short HEAD)" \
+#   --tag ghcr.io/teaxyz/infuser:nightly-"$(date +%F)" \
+#   --platform linux/amd64,linux/arm64 \
+#   --file infuser/Dockerfile \
+#   --build-arg GITHUB_TOKEN="$GITHUB_TOKEN" \
+#   --progress=plain \
+#   .
