@@ -1,10 +1,14 @@
+name: CD
+
 on:
   push:
     branches:
       - main
     paths:
-      - Dockerfile
+      - Dockerfile.slim
       - .github/workflows/cd.yml
+  schedule:
+    - cron: '0 6 * * *'
   workflow_dispatch:
 
 concurrency:
@@ -18,9 +22,6 @@ env:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
-
-    # this takes a long time due to aarch64 qemu
-    timeout-minutes: 1440
 
     permissions:
       contents: read
@@ -57,23 +58,23 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha
-            type=ref,event=branch
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,prefix=slim-
+            type=ref,event=branch,prefix=slim-
+            type=raw,value=slim-latest,enable={{is_default_branch}}
+            type=raw,value=slim,enable={{is_default_branch}}
+            type=schedule,enable=${{ github.event_name == 'schedule' && 'true' || 'false' }},pattern={{date 'YYYYMMDD'}},prefix=slim-nightly-
 
       - uses: crazy-max/ghaction-docker-buildx@v1
         with:
           version: latest
 
       - name: docker buildx
-        # this takes a long time due to aarch64 qemu
-        timeout-minutes: 1440
         run: |
-          for x in $(echo ${{ steps.meta.outputs.tags}}); do tags="$tags --tag $x"; done
+          for x in $(echo "${{ steps.meta.outputs.tags}}" | tr '\n' ' '); do tags="$tags --tag $x"; done
           docker buildx build \
             --push \
             $tags \
             --platform linux/amd64,linux/arm64 \
-            --file infuser/Dockerfile \
+            --file infuser/Dockerfile.slim \
             --build-arg GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
             .
