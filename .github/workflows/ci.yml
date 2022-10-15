@@ -1,9 +1,30 @@
+name: CI
+
 on:
   pull_request:
 
 jobs:
-  direct:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ludeeus/action-shellcheck@1.1.0
+
+      - name: co infuser
+        uses: actions/checkout@v3
+        with:
+          path: infuser
+
+      - name: co pantry
+        uses: actions/checkout@v3
+        with:
+          repository: teaxyz/pantry
+          path: pantry
+          token: ${{ secrets.TEMP_JACOBS_GITHUB_PAT }}
+
+      - name: docker build
+        run: |
+          docker build \
+          --file infuser/Dockerfile.slim \
+          --build-arg TEA_SECRET=${{ secrets.TEA_SECRET }} \
+          .
