@@ -21,6 +21,11 @@ RUN cd /home/builder && mkdir actions-runner && cd actions-runner \
     && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-arm64-${RUNNER_VERSION}.tar.gz \
     && tar xzf ./actions-runner-linux-arm64-${RUNNER_VERSION}.tar.gz
 
+# Clean the environment
+RUN echo ACTIONS_RUNNER_HOOK_JOB_STARTED=/home/builder/pre-run.sh >>/home/builder/actions-runner/.env
+COPY pre-run.sh /home/builder/pre-run.sh
+RUN chmod +x /home/builder/pre-run.sh
+
 # install some additional dependencies
 RUN chown -R builder ~builder /opt && /home/builder/actions-runner/bin/installdependencies.sh
 
