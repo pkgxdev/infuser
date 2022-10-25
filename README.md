@@ -206,3 +206,21 @@ docker buildx build \
   --build-arg TEA_SECRET=$TEA_SECRET \
   .
 ```
+
+# Host your own runner
+
+Until Github Actions supports aarch64 runners, we need to self host them. Darwin is pretty easy,
+but Linux might be even easier. Checkout out `gha-runner/Dockerfile`. It should be as simple as:
+
+```sh
+docker build --tag runner-image gha-runner
+
+docker run \
+  --detach \
+  --restart=unless-stopped \
+  --env ORGANIZATION=$GITHUB_ORG \
+  --env ACCESS_TOKEN=$GITHUB_PAT \
+  runner-image
+```
+
+Token requires the `repo`, `workflow`, and `admin:org` scopes.

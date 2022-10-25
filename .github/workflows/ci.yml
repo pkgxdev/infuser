@@ -22,9 +22,16 @@ jobs:
           path: pantry
           token: ${{ secrets.TEMP_JACOBS_GITHUB_PAT }}
 
-      - name: docker build
+      - name: docker build infuser:slim
         run: |
           docker build \
           --file infuser/Dockerfile.slim \
           --build-arg TEA_SECRET=${{ secrets.TEA_SECRET }} \
           .
+
+      - name: docker build gha-runner
+        run: |
+          docker build \
+          --file infuser/gha-runner/Dockerfile \
+          --build-arg TEA_SECRET=${{ secrets.TEA_SECRET }} \
+          gha-runner

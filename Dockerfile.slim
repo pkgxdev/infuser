@@ -3,7 +3,7 @@ ARG TEA_SECRET
 ENV TEA_SECRET=$TEA_SECRET
 
 RUN apt-get update
-RUN apt-get install --yes curl
+RUN apt-get install --yes curl sudo
 
 RUN curl https://tea.xyz | PREFIX=/opt YES=1 bash
 ADD pantry /opt/tea.xyz/var/pantry
@@ -13,4 +13,4 @@ COPY --from=stage0 /opt /opt
 
 RUN ln -s /opt/tea.xyz/v0/bin/tea /usr/local/bin/tea \
  && apt-get update \
- && apt-get --yes install libc-dev libstdc++-8-dev libgcc-8-dev patchelf file
+ && apt-get --yes install libc-dev libstdc++-8-dev libgcc-8-dev patchelf file sudo
