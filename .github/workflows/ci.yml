@@ -27,6 +27,12 @@ jobs:
           repository: teaxyz/pantry.extra
           path: pantry.extra
 
+      - name: co cli
+        uses: actions/checkout@v3
+        with:
+          repository: teaxyz/cli
+          path: cli
+
       - name: docker build infuser
         run: |
           docker build \
