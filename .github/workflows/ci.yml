@@ -37,6 +37,7 @@ jobs:
         run: |
           docker build \
           --file infuser/Dockerfile \
+          --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
           .
         env:
           GITHUB_TOKEN: ${{ github.token }}
