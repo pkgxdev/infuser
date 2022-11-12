@@ -30,20 +30,6 @@ jobs:
     steps:
       - name: co infuser
         uses: actions/checkout@v3
-        with:
-          path: infuser
-
-      - name: co pantry.core
-        uses: actions/checkout@v3
-        with:
-          repository: teaxyz/pantry.core
-          path: pantry.core
-
-      - name: co pantry.extra
-        uses: actions/checkout@v3
-        with:
-          repository: teaxyz/pantry.extra
-          path: pantry.extra
 
       - uses: docker/login-action@v2
         with:
@@ -73,5 +59,5 @@ jobs:
             --push \
             $tags \
             --platform linux/amd64,linux/arm64 \
-            --file infuser/Dockerfile.slim \
+            --file Dockerfile.slim \
             .
