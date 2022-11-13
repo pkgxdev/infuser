@@ -16,7 +16,8 @@ Getting Started
     mkdir ~/tea
     cd ~/tea
     git clone https://github.com/teaxyz/cli
-    git clone https://github.com/teaxyz/pantry
+    git clone https://github.com/teaxyz/pantry.core
+    git clone https://github.com/teaxyz/pantry.extra
     git clone https://github.com/teaxyz/infuser
 
     test -n $GITHUB_TOKEN || echo "GITHUB_TOKEN not set! b0rkage imminent!"
@@ -50,7 +51,7 @@ Debugging is easier if you can hack using your native machine.
       --hostname tea \
       --interactive --tty \
       --volume /opt/tea.xyz/var/www:/opt/tea.xyz/var/www \
-      --volume $PWD/pantry:/opt/tea.xyz/var/pantry \
+      --volume $PWD/pantry.core:/opt/tea.xyz/var/pantry \
       --volume $PWD/cli:/opt/tea.xyz/var/cli \
       --workdir /opt/tea.xyz/var/pantry \
       --env GITHUB_TOKEN \
@@ -117,7 +118,7 @@ Building the Multi-Arch Image (But Faster)
 It takes a very long time to build aarch64 on x86-64. So we want to build
 natively and then combine them in one step.
 
-> **NOTE** you must use a precise copy of `teaxyz/cli`, `teaxyz/pantry` &
+> **NOTE** you must use a precise copy of `teaxyz/cli`, `teaxyz/pantry.core` &
 > `teaxyz/infuser` on both machines.
 > Use `rsync -Rav ~/tea $X86_64_HOSTNAME.local:tea`.
 > You may need to add `.git` to `~/tea/.dockerignore`.
@@ -185,7 +186,7 @@ docker run \
   --hostname tea \
   --interactive --tty \
   --volume /opt/tea.xyz/var/www:/opt/tea.xyz/var/www \
-  --volume $PWD/pantry:/opt/tea.xyz/var/pantry \
+  --volume $PWD/pantry.core:/opt/tea.xyz/var/pantry \
   --volume $PWD/cli:/opt/tea.xyz/var/cli \
   --workdir /opt/tea.xyz/var/pantry \
   --platform linux/amd64 \

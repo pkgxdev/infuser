@@ -1,5 +1,5 @@
 FROM debian:buster-slim as stage0
-ARG vDENO=1.25.3
+ARG vDENO=1.27.0
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=$GITHUB_TOKEN
 
@@ -27,6 +27,7 @@ WORKDIR /cli
 RUN /opt/deno.land/v$vDENO/bin/deno compile \
   --allow-read --allow-write=/opt --allow-net --allow-run --allow-env \
   --import-map=/cli/import-map.json \
+  --unstable \
   --output tea \
   src/app.ts
 
@@ -60,6 +61,8 @@ RUN \
     curl.se/v6.0.0 \
     openssl.org/v1.1.0 \
     perl.org/v5.0.0 \
+    zlib.net/v1.0.0 \
+    tea.xyz/gx/cc/v0.1.0 \
   ; \
   do \
     mkdir -p /opt/$x; \
@@ -69,100 +72,111 @@ RUN \
 RUN apt-get update
 RUN apt-get install --yes make cmake ninja-build python3 clang perl patchelf curl
 
-ADD pantry/projects/llvm.org                     projects/llvm.org
-ADD pantry/projects/deno.land                    projects/deno.land
-ADD pantry/scripts/build.ts                      scripts/build.ts
-ADD pantry/scripts/brewkit                       scripts/brewkit
-ADD pantry/scripts/build                         scripts/build
-ADD pantry/scripts/utils                         scripts/utils
-ADD pantry/import-map.json                       import-map.json
-ADD cli/scripts/repair.ts                        scripts
-ADD pantry/README.md                             README.md
+ADD pantry.core/projects/llvm.org                     projects/llvm.org
+ADD pantry.core/projects/deno.land                    projects/deno.land
+ADD pantry.core/scripts/build.plumbing.ts             scripts/build.plumbing.ts
+ADD pantry.core/scripts/fetch.ts                      scripts/fetch.ts
+ADD pantry.core/scripts/brewkit                       scripts/brewkit
+ADD pantry.core/scripts/build                         scripts/build
+ADD pantry.core/scripts/utils                         scripts/utils
+ADD pantry.core/import-map.json                       import-map.json
+ADD cli/scripts/repair.ts                             scripts
+ADD pantry.core/README.md                             README.md
 
 RUN mkdir .git
 # ^^ trick tea into finding SRCROOT
 
+# tea.xyz/gx/cc
+ADD pantry.core/projects/tea.xyz/gx/cc                projects/tea.xyz/gx/cc
+RUN scripts/build.plumbing.ts tea.xyz/gx/cc
+
 # gnu.org/m4
-ADD pantry/projects/gnu.org/m4                   projects/gnu.org/m4
-ADD pantry/projects/sourceware.org/bzip2         projects/sourceware.org/bzip2
-ADD pantry/projects/darwinsys.com/file           projects/darwinsys.com/file
-ADD pantry/projects/nixos.org/patchelf           projects/nixos.org/patchelf
-ADD pantry/projects/tukaani.org/xz               projects/tukaani.org/xz
-ADD pantry/projects/gnu.org/make                 projects/gnu.org/make
-ADD pantry/projects/gnu.org/tar                  projects/gnu.org/tar
-ADD pantry/projects/zlib.net                     projects/zlib.net
-RUN scripts/build.ts gnu.org/m4
+ADD pantry.core/projects/gnu.org/m4                   projects/gnu.org/m4
+ADD pantry.core/projects/sourceware.org/bzip2         projects/sourceware.org/bzip2
+ADD pantry.core/projects/darwinsys.com/file           projects/darwinsys.com/file
+ADD pantry.extra/projects/nixos.org/patchelf          projects/nixos.org/patchelf
+ADD pantry.core/projects/tukaani.org/xz               projects/tukaani.org/xz
+ADD pantry.core/projects/gnu.org/make                 projects/gnu.org/make
+ADD pantry.core/projects/gnu.org/tar                  projects/gnu.org/tar
+ADD pantry.core/projects/zlib.net                     projects/zlib.net
+RUN scripts/build.plumbing.ts gnu.org/m4
 
 # gnu.org/make
-ADD pantry/projects/freedesktop.org/pkg-config   projects/freedesktop.org/pkg-config
-RUN scripts/build.ts gnu.org/make
+ADD pantry.core/projects/freedesktop.org/pkg-config   projects/freedesktop.org/pkg-config
+RUN scripts/build.plumbing.ts gnu.org/make
 
 # freedesktop.org/pkg-config
-RUN scripts/build.ts freedesktop.org/pkg-config
+RUN scripts/build.plumbing.ts freedesktop.org/pkg-config
 
 # invisible-island.net/ncurses
-ADD pantry/projects/invisible-island.net/ncurses projects/invisible-island.net/ncurses
-RUN scripts/build.ts invisible-island.net/ncurses
+ADD pantry.core/projects/invisible-island.net/ncurses projects/invisible-island.net/ncurses
+RUN scripts/build.plumbing.ts invisible-island.net/ncurses
 
 # gnu.org/readline
-ADD pantry/projects/gnu.org/readline             projects/gnu.org/readline
-RUN scripts/build.ts gnu.org/readline
+ADD pantry.core/projects/gnu.org/readline             projects/gnu.org/readline
+RUN scripts/build.plumbing.ts gnu.org/readline
 
 # zlib.net
-RUN scripts/build.ts zlib.net
+RUN scripts/build.plumbing.ts zlib.net
 
 # sourceware.org/bzip2
-RUN scripts/build.ts sourceware.org/bzip2
+RUN scripts/build.plumbing.ts sourceware.org/bzip2
 
 # sourceware.org/libffi
-ADD pantry/projects/sourceware.org/libffi        projects/sourceware.org/libffi
-RUN scripts/build.ts sourceware.org/libffi
+ADD pantry.core/projects/sourceware.org/libffi        projects/sourceware.org/libffi
+RUN scripts/build.plumbing.ts sourceware.org/libffi
 
 # libexpat.github.io
-ADD pantry/projects/libexpat.github.io           projects/libexpat.github.io
-RUN scripts/build.ts libexpat.github.io
+ADD pantry.core/projects/libexpat.github.io           projects/libexpat.github.io
+RUN scripts/build.plumbing.ts libexpat.github.io
 
 # bytereef.org/mpdecimal
-ADD pantry/projects/bytereef.org/mpdecimal       projects/bytereef.org/mpdecimal
-RUN scripts/build.ts bytereef.org/mpdecimal
+ADD pantry.core/projects/bytereef.org/mpdecimal       projects/bytereef.org/mpdecimal
+RUN scripts/build.plumbing.ts bytereef.org/mpdecimal
 
 # tukaani.org/xz
-RUN scripts/build.ts tukaani.org/xz
+RUN scripts/build.plumbing.ts tukaani.org/xz
 
 # sqlite.org
-ADD pantry/projects/sqlite.org                   projects/sqlite.org
-RUN scripts/build.ts sqlite.org
+ADD pantry.core/projects/sqlite.org                   projects/sqlite.org
+RUN scripts/build.plumbing.ts sqlite.org
 
 # llvm.org
-ADD pantry/projects/cmake.org                    projects/cmake.org
-ADD pantry/projects/ninja-build.org              projects/ninja-build.org
-ADD pantry/projects/openssl.org                  projects/openssl.org
-ADD pantry/projects/python.org                   projects/python.org
-ADD pantry/projects/curl.se                      projects/curl.se
-RUN scripts/build.ts llvm.org
+ADD pantry.core/projects/cmake.org                    projects/cmake.org
+ADD pantry.core/projects/ninja-build.org              projects/ninja-build.org
+ADD pantry.core/projects/openssl.org                  projects/openssl.org
+ADD pantry.core/projects/python.org                   projects/python.org
+ADD pantry.core/projects/curl.se                      projects/curl.se
+RUN scripts/build.plumbing.ts llvm.org
 
 # gnome.org/libxml2
-ADD pantry/projects/gnome.org/libxml2            projects/gnome.org/libxml2
-RUN scripts/build.ts gnome.org/libxml2
+ADD pantry.extra/projects/gnome.org/libxml2            projects/gnome.org/libxml2
+RUN scripts/build.plumbing.ts gnome.org/libxml2
 
 # gnu.org/gettext
-ADD pantry/projects/gnu.org/gettext              projects/gnu.org/gettext
-RUN scripts/build.ts gnu.org/gettext
+ADD pantry.core/projects/gnu.org/gettext              projects/gnu.org/gettext
+RUN scripts/build.plumbing.ts gnu.org/gettext
 
 # git-scm.org
-ADD pantry/projects/git-scm.org                  projects/git-scm.org
-ADD pantry/projects/perl.org                     projects/perl.org
-RUN scripts/build.ts git-scm.org
+ADD pantry.core/projects/git-scm.org                  projects/git-scm.org
+ADD pantry.core/projects/perl.org                     projects/perl.org
+RUN scripts/build.plumbing.ts git-scm.org
 
 # openssl.org
-RUN scripts/build.ts openssl.org
+RUN scripts/build.plumbing.ts openssl.org
 
 # curl.se
-RUN scripts/build.ts curl.se
+RUN scripts/build.plumbing.ts curl.se
 
 # tea.xyz
-ADD pantry/projects/tea.xyz                      projects/tea.xyz
-RUN scripts/build.ts tea.xyz
+ADD pantry.core/projects/tea.xyz                      projects/tea.xyz
+RUN scripts/build.plumbing.ts tea.xyz
+
+# nixos.org/patchelf
+RUN scripts/build.plumbing.ts nixos.org/patchelf
+
+# darwinsys.com/file
+RUN scripts/build.plumbing.ts darwinsys.com/file
 
 RUN scripts/repair.ts deno.land tea.xyz
 
@@ -185,7 +199,7 @@ RUN rm -rf /opt/tea.xyz/var/www
 FROM debian:buster-slim as stage2
 
 COPY --from=stage1 /opt /opt
-ADD pantry /opt/tea.xyz/var/pantry
+ADD pantry.core /opt/tea.xyz/var/pantry
 
 RUN \
   ln -s /opt/tea.xyz/v'*'/bin/tea /usr/local/bin/tea && \
@@ -193,7 +207,5 @@ RUN \
   apt-get install --yes libc-dev libstdc++-8-dev libgcc-8-dev && \
   #FIXME for opening tarballs
   apt-get install --yes bzip2 xz-utils && \
-  # required by build infra
-  apt-get --yes install patchelf file && \
   # required on aarch64 by `ghcup`
   apt-get --yes install libnuma1

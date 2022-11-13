@@ -30,15 +30,6 @@ jobs:
     steps:
       - name: co infuser
         uses: actions/checkout@v3
-        with:
-          path: infuser
-
-      - name: co pantry
-        uses: actions/checkout@v3
-        with:
-          repository: teaxyz/pantry
-          path: pantry
-          token: ${{ secrets.TEMP_JACOBS_GITHUB_PAT }}
 
       - uses: docker/login-action@v2
         with:
@@ -68,6 +59,5 @@ jobs:
             --push \
             $tags \
             --platform linux/amd64,linux/arm64 \
-            --file infuser/Dockerfile.slim \
-            --build-arg TEA_SECRET=${{ secrets.TEA_SECRET }} \
+            --file Dockerfile.slim \
             .
