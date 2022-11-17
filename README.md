@@ -210,8 +210,9 @@ docker buildx build \
 
 # Host your own runner
 
-Until Github Actions supports aarch64 runners, we need to self host them. Darwin is pretty easy,
-but Linux might be even easier. Checkout out `gha-runner/Dockerfile`. It should be as simple as:
+Until Github Actions supports aarch64 runners, we need to self host them.
+Darwin is pretty easy, but Linux might be even easier. Checkout out
+`gha-runner/Dockerfile`. It should be as simple as:
 
 ```sh
 docker build --tag runner-image gha-runner
