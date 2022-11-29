@@ -4,6 +4,16 @@ on:
   pull_request:
 
 jobs:
+  markdownlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nosborn/github-action-markdown-cli@v3.2.0
+        with:
+          config_file: .github/markdownlint.yml
+          files: .
+          dot: true
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -33,19 +43,13 @@ jobs:
           repository: teaxyz/cli
           path: cli
 
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
       - name: docker build infuser
         run: |
           docker build \
           --file infuser/Dockerfile \
-          --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
-          .
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: docker build infuser:slim
-        run: |
-          docker build \
-          --file infuser/Dockerfile.slim \
           .
 
       - name: docker build gha-runner

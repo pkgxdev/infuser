@@ -10,6 +10,39 @@ platform’s libc. With this all other tea packages can be built.
 Our goal is to provide an image that is just libc and `tea` with a sensible
 (stable) kernel choice but currently we are not there.
 
+# `infuser:slim` (Previously: `infuser:slim`)
+
+```sh
+docker buildx build \
+  --pull --push \
+  --tag ghcr.io/teaxyz/infuser:latest \
+  --platform linux/amd64,linux/arm64 \
+  --file infuser/Dockerfile \
+  --build-arg TEA_SECRET=$TEA_SECRET \
+  .
+```
+
+# Host your own runner
+
+Until Github Actions supports aarch64 runners, we need to self host them.
+Darwin is pretty easy, but Linux might be even easier. Checkout out
+`gha-runner/Dockerfile`. It should be as simple as:
+
+```sh
+docker build --tag runner-image gha-runner
+
+docker run \
+  --detach \
+  --restart=unless-stopped \
+  --env ORGANIZATION=$GITHUB_ORG \
+  --env ACCESS_TOKEN=$GITHUB_PAT \
+  runner-image
+```
+
+Token requires the `repo`, `workflow`, and `admin:org` scopes.
+
+
+## Older (bootstrap) docs
 
 Getting Started
 ---------------
@@ -24,7 +57,7 @@ Getting Started
 
     docker build \
       --tag ghcr.io/teaxyz/infuser:latest \
-      --file infuser/Dockerfile \
+      --file infuser/Dockerfile.bootstrap \
       --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
       .
 
@@ -107,7 +140,7 @@ docker buildx build \
   --tag ghcr.io/teaxyz/infuser:$(git -C infuser branch --show-current) \
   --tag ghcr.io/teaxyz/infuser:sha-$(git -C infuser rev-parse --short HEAD) \
   --platform linux/amd64,linux/arm64 \
-  --file infuser/Dockerfile \
+  --file infuser/Dockerfile.bootstrap \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
   .
 ```
@@ -149,7 +182,7 @@ docker run -d -p 5000:5000 --name registry --restart=always registry:latest
 docker buildx build \
   --platform linux/arm64 \
   --tag ghcr.io/teaxyz/infuser:latest \
-  --file infuser/Dockerfile \
+  --file infuser/Dockerfile.bootstrap \
   --load \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
   --cache-to type=registry,ref=$X86_64_HOSTNAME.local:5000/tea,mode=max \
@@ -164,7 +197,7 @@ docker buildx build \
   --tag ghcr.io/teaxyz/infuser:$(git -C infuser branch --show-current) \
   --tag ghcr.io/teaxyz/infuser:sha-$(git -C infuser rev-parse --short HEAD) \
   --platform linux/amd64,linux/arm64 \
-  --file infuser/Dockerfile \
+  --file infuser/Dockerfile.bootstrap \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
   --cache-from $X86_64_HOSTNAME.local:5000/tea \
   .
@@ -194,35 +227,3 @@ docker run \
   ghcr.io/teaxyz/infuser:latest \
   /bin/bash
 ```
-
-
-# `infuser:slim`
-
-```sh
-docker buildx build \
-  --pull --push \
-  --tag ghcr.io/teaxyz/infuser:slim \
-  --platform linux/amd64,linux/arm64 \
-  --file infuser/Dockerfile.slim \
-  --build-arg TEA_SECRET=$TEA_SECRET \
-  .
-```
-
-# Host your own runner
-
-Until Github Actions supports aarch64 runners, we need to self host them.
-Darwin is pretty easy, but Linux might be even easier. Checkout out
-`gha-runner/Dockerfile`. It should be as simple as:
-
-```sh
-docker build --tag runner-image gha-runner
-
-docker run \
-  --detach \
-  --restart=unless-stopped \
-  --env ORGANIZATION=$GITHUB_ORG \
-  --env ACCESS_TOKEN=$GITHUB_PAT \
-  runner-image
-```
-
-Token requires the `repo`, `workflow`, and `admin:org` scopes.
