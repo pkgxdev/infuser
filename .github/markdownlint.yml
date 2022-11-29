@@ -12,3 +12,6 @@ MD003: false
 
 # allow indented code blocks
 MD046: false
+
+# allow long lines
+MD013: false
