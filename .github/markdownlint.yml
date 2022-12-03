@@ -1,0 +1,17 @@
+# use banner rather than an h1 at the top of the file
+MD041: false
+
+# extra lines to offset content
+MD012: false
+
+# extra lines not needed
+MD022: false
+
+# allow underline style
+MD003: false
+
+# allow indented code blocks
+MD046: false
+
+# allow long lines
+MD013: false
