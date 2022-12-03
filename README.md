@@ -10,7 +10,7 @@ platform’s libc. With this all other tea packages can be built.
 Our goal is to provide an image that is just libc and `tea` with a sensible
 (stable) kernel choice but currently we are not there.
 
-# `infuser:slim` (Previously: `infuser:slim`)
+# `infuser:latest` (Previously: `infuser:slim`)
 
 ```sh
 docker buildx build \
@@ -18,7 +18,6 @@ docker buildx build \
   --tag ghcr.io/teaxyz/infuser:latest \
   --platform linux/amd64,linux/arm64 \
   --file infuser/Dockerfile \
-  --build-arg TEA_SECRET=$TEA_SECRET \
   .
 ```
 
