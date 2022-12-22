@@ -56,7 +56,7 @@ Getting Started
 
     docker build \
       --tag ghcr.io/teaxyz/infuser:latest \
-      --file infuser/Dockerfile.bootstrap \
+      --file infuser/bootstrap/Dockerfile \
       --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
       .
 
@@ -139,7 +139,7 @@ docker buildx build \
   --tag ghcr.io/teaxyz/infuser:$(git -C infuser branch --show-current) \
   --tag ghcr.io/teaxyz/infuser:sha-$(git -C infuser rev-parse --short HEAD) \
   --platform linux/amd64,linux/arm64 \
-  --file infuser/Dockerfile.bootstrap \
+  --file infuser/bootstrap/Dockerfile \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
   .
 ```
@@ -181,7 +181,7 @@ docker run -d -p 5000:5000 --name registry --restart=always registry:latest
 docker buildx build \
   --platform linux/arm64 \
   --tag ghcr.io/teaxyz/infuser:latest \
-  --file infuser/Dockerfile.bootstrap \
+  --file infuser/bootstrap/Dockerfile \
   --load \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
   --cache-to type=registry,ref=$X86_64_HOSTNAME.local:5000/tea,mode=max \
@@ -196,7 +196,7 @@ docker buildx build \
   --tag ghcr.io/teaxyz/infuser:$(git -C infuser branch --show-current) \
   --tag ghcr.io/teaxyz/infuser:sha-$(git -C infuser rev-parse --short HEAD) \
   --platform linux/amd64,linux/arm64 \
-  --file infuser/Dockerfile.bootstrap \
+  --file infuser/bootstrap/Dockerfile \
   --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
   --cache-from $X86_64_HOSTNAME.local:5000/tea \
   .

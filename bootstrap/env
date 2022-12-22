@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -xf
+
+# shellcheck disable=SC2116
+for i in $(echo "$@"); do
+  case "$i" in
+    -S)
+      ;;
+    *)
+      ARGS="$ARGS $i"
+  esac
+done
+
+# shellcheck disable=SC2086
+exec env.bak $ARGS
