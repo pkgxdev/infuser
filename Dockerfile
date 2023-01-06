@@ -3,7 +3,7 @@ FROM debian:buster-slim as stage0
 RUN apt-get update
 RUN apt-get install --yes curl sudo
 
-RUN curl https://tea.xyz | YES=1 sh
+RUN curl https://tea.xyz | TEA_YES=1 sh
 
 FROM debian:buster-slim as stage1
 COPY --from=stage0 /root/.tea /root/.tea
