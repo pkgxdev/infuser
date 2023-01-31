@@ -41,15 +41,10 @@ jobs:
         id: meta
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          # TODO: deprecate slim- tags
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=slim,enable={{is_default_branch}}
             type=ref,event=branch,prefix=
             type=schedule,enable=${{ github.event_name == 'schedule' && 'true' || 'false' }},pattern={{date 'YYYYMMDD'}},prefix=nightly-
-            type=sha,prefix=slim-
-            type=raw,value=slim-latest,enable={{is_default_branch}}
-            type=schedule,enable=${{ github.event_name == 'schedule' && 'true' || 'false' }},pattern={{date 'YYYYMMDD'}},prefix=slim-nightly-
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
