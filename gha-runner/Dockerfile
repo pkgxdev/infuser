@@ -18,8 +18,9 @@ RUN curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -
     && chmod a+rx /usr/local/bin/jq
 # cd into the user directory, download and unzip the github actions runner
 RUN cd /home/builder && mkdir actions-runner && cd actions-runner \
-    && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-arm64-${RUNNER_VERSION}.tar.gz \
-    && tar xzf ./actions-runner-linux-arm64-${RUNNER_VERSION}.tar.gz
+    && ARCH=$(uname -m | sed -e 's/aarch64/arm64/' -e 's/x86_64/x64/') \
+    && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz \
+    && tar xzf ./actions-runner-linux-${ARCH}-${RUNNER_VERSION}.tar.gz
 
 # Clean the environment
 RUN echo ACTIONS_RUNNER_HOOK_JOB_STARTED=/home/builder/pre-run.sh >>/home/builder/actions-runner/.env
