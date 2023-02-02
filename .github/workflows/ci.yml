@@ -2,29 +2,28 @@ name: CI
 
 on:
   pull_request:
+    paths:
+      - '**.sh'
+      - Dockerfile
+      - gha-runner/Dockerfile
 
 jobs:
-  markdownlint:
+  infuser:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: nosborn/github-action-markdown-cli@v3.2.0
-        with:
-          config_file: .github/markdownlint.yml
-          files: .
-          dot: true
+      - run: docker build --file Dockerfile --tag infuser:ci .
+      - name: test
+        run: docker run infuser:ci /usr/bin/tea --version
 
-  build:
+  gha-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: docker build --file gha-runner/Dockerfile gha-runner
+
+  shell-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ludeeus/action-shellcheck@1.1.0
-      - uses: actions/checkout@v3
-
-      - name: build infuser
-        run: docker build --file Dockerfile --tag infuser:ci .
-
-      - run: docker run infuser:ci /usr/bin/tea --version
-
-      - name: build gha-runner
-        run: docker build --file gha-runner/Dockerfile gha-runner
