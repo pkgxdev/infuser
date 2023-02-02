@@ -12,4 +12,4 @@ COPY --from=stage0 /root/.bashrc /root/.bashrc
 
 RUN sh /root/.tea/install-pre-reqs.sh \
   && rm /root/.tea/install-pre-reqs.sh \
-  && ln /root/.tea/tea.xyz/v*/bin/tea /usr/bin/tea
+  && ln /root/.tea/tea.xyz/v*/bin/tea /usr/bin
