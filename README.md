@@ -1,27 +1,12 @@
 ![tea.xyz](https://tea.xyz/banner.png)
 
-The infuser manages our docker images for platforms we support.
-
-Obviously this cannot include macOS because *Apple*.
-
-The result is a docker image that contains a c compiler and GNU make, with the
-platform’s libc. With this all other tea packages can be built.
-
-Our goal is to provide an image that is just libc and `tea` with a sensible
-(stable) kernel choice but currently we are not there.
-
-# `infuser:latest` (Previously: `infuser:slim`)
+A container with `tea` and its magic installed and functional.
 
 ```sh
-docker buildx build \
-  --pull --push \
-  --tag ghcr.io/teaxyz/infuser:latest \
-  --platform linux/amd64,linux/arm64 \
-  --file infuser/Dockerfile \
-  .
+docker run --rm -it ghcr.io/teaxyz/infuser /bin/bash
 ```
 
-# Host your own runner
+# Host Your Own GitHub Actions Runner
 
 Until Github Actions supports aarch64 runners, we need to self host them.
 Darwin is pretty easy, but Linux might be even easier. Checkout out
@@ -33,46 +18,47 @@ docker build --tag runner-image gha-runner
 docker run \
   --detach \
   --restart=unless-stopped \
-  --env ORGANIZATION=$GITHUB_ORG \
-  --env ACCESS_TOKEN=$GITHUB_PAT \
+  --env ORGANIZATION=$UR_GITHUB_ORG \
+  --env ACCESS_TOKEN=$(gh auth token) \
   runner-image
 ```
 
 Token requires the `repo`, `workflow`, and `admin:org` scopes.
 
 
-## Older (bootstrap) docs
+# Bootstrapping a tea Pantry
 
-Getting Started
----------------
-    mkdir ~/tea
-    cd ~/tea
-    git clone https://github.com/teaxyz/cli
-    git clone https://github.com/teaxyz/pantry.core
-    git clone https://github.com/teaxyz/pantry.extra
-    git clone https://github.com/teaxyz/infuser
+`Dockerfile.bootstrap` can create an image ready to bootstrap packages for a
+platform tea doesn’t yet support.
 
-    test -n $GITHUB_TOKEN || echo "GITHUB_TOKEN not set! b0rkage imminent!"
+The result is a docker image that contains a c compiler and GNU make, with the
+platform’s libc. With this all other tea packages can be built.
 
-    docker build \
-      --tag ghcr.io/teaxyz/infuser:latest \
-      --file infuser/Dockerfile.bootstrap \
-      --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
-      .
+```sh
+mkdir ~/tea
+cd ~/tea
+git clone https://github.com/teaxyz/cli
+git clone https://github.com/teaxyz/pantry.core
+git clone https://github.com/teaxyz/pantry.extra
+git clone https://github.com/teaxyz/infuser
 
-    docker run \
-      --env GITHUB_TOKEN \
-      --hostname tea \
-      --interactive --tty \
-      ghcr.io/teaxyz/infuser:latest \
-      /bin/bash
+docker build \
+  --tag ghcr.io/teaxyz/infuser:latest \
+  --file infuser/Dockerfile.bootstrap \
+  --build-arg GITHUB_TOKEN=$(gh auth token) \
+  .
 
-The best way to figure out the container name is with the docker
-dashboard GUI.
+docker run \
+  --env GITHUB_TOKEN=$(gh auth token) \
+  --hostname tea \
+  --interactive --tty \
+  ghcr.io/teaxyz/infuser:latest \
+  /bin/bash
+```
 
-`GITHUB_TOKEN` is required when building tea packages to use the GitHub
-GraphQL API for release and tag lookup. You will indeed need to generate a
-*personal access token* (PAT) (no additional permissions are required).
+A `GITHUB_TOKEN` is required when building tea packages to use the GitHub
+GraphQL API for release and tag lookup. A PAT with no other permissions is
+acceptable though it is easiest to use `gh` as above.
 
 
 Debugging
@@ -104,7 +90,6 @@ Use `--progress=plain` in the `docker build` instantiation to get logs
 
 Publishing Local Images
 -----------------------
-
 At this early stage we are building certain images locally and pushing to
 the GitHub package registry. This is not as secure as we’d like so we will be
 changing it.
@@ -116,7 +101,7 @@ docker tag $HOST:latest $HOST:$BRANCH
 
 # https://github.com/settings/tokens/new
 #  => write:packages read:packages
-echo $GITHUB_TOKEN | docker login ghcr.io -u mxcl --password-stdin
+echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USER --password-stdin
 
 docker push $HOST:latest
 docker push $HOST:$BRANCH
