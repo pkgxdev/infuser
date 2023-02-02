@@ -19,41 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ludeeus/action-shellcheck@1.1.0
+      - uses: actions/checkout@v3
 
-      - name: co infuser
-        uses: actions/checkout@v3
-        with:
-          path: infuser
+      - name: build infuser
+        run: docker build --file Dockerfile --tag infuser:ci .
 
-      - name: co pantry.core
-        uses: actions/checkout@v3
-        with:
-          repository: teaxyz/pantry.core
-          path: pantry.core
+      - run: docker run infuser:ci /usr/bin/tea --version
 
-      - name: co pantry.extra
-        uses: actions/checkout@v3
-        with:
-          repository: teaxyz/pantry.extra
-          path: pantry.extra
-
-      - name: co cli
-        uses: actions/checkout@v3
-        with:
-          repository: teaxyz/cli
-          path: cli
-
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: docker build infuser
-        run: |
-          docker build \
-          --file infuser/Dockerfile \
-          .
-
-      - name: docker build gha-runner
-        run: |
-          docker build \
-          --file infuser/gha-runner/Dockerfile \
-          gha-runner
+      - name: build gha-runner
+        run: docker build --file gha-runner/Dockerfile gha-runner
