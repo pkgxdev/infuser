@@ -15,4 +15,4 @@ RUN sh /root/.tea/install-pre-reqs.sh \
   && rm /root/.tea/install-pre-reqs.sh \
   && ln /root/.tea/tea.xyz/v\*/bin/tea /usr/bin
 
-ENTRYPOINT /bin/bash
+CMD ["bash"]
