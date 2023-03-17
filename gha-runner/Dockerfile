@@ -11,7 +11,7 @@ RUN apt-get update -y && apt-get upgrade -y && useradd -m builder
 # add additional packages as necessary
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     curl build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip \
-    wget awscli strace less vim sudo
+    wget awscli strace less vim sudo cron rsyslog
 
 # required for chetan/invalidate-cloudfront-action@v2; must be 1.6 (buster ships 1.5)
 RUN curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq \
@@ -35,6 +35,12 @@ COPY start.sh start.sh
 
 # make the script executable
 RUN chmod +x start.sh
+
+# copy over the crontab file
+COPY crontab crontab
+
+# install the crontab file as root
+RUN crontab crontab
 
 # make builder able to run apt-get without a password
 RUN usermod -aG sudo builder
