@@ -1,1 +1,1 @@
-0 * * * * find /tmp/ -mindepth 1 -maxdepth 1 -type d -mtime +1 -name '????????' -exec rm -rm {} \;
+0 * * * * find /tmp/ -mindepth 1 -maxdepth 1 -type d -mtime +1 -name '????????' -exec rm -rf {} \;
