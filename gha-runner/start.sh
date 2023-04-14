@@ -2,8 +2,8 @@
 
 set -e
 
-sudo service rsyslog start
-sudo service cron start
+# sudo service rsyslog start
+# sudo service cron start
 
 # With thanks to https://testdriven.io/blog/github-actions-docker/
 

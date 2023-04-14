@@ -10,3 +10,5 @@ for DIR in "${TO_CLEAN[@]}"; do
     rm -rf "${HOME:?}"/"${DIR:?}" || true
   fi
 done
+
+find /tmp/ -mindepth 1 -maxdepth 1 -type d -name '????????' -exec sudo rm -rf {} \;
