@@ -12,3 +12,4 @@ for DIR in "${TO_CLEAN[@]}"; do
 done
 
 find /tmp/ -mindepth 1 -maxdepth 1 -type d -name '????????' -exec sudo rm -rf {} \;
+find /tmp/ -mindepth 1 -maxdepth 1 -type d -name 'xyz.tea.*' -exec sudo rm -rf {} \;
