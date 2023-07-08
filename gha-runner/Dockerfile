@@ -1,18 +1,16 @@
 # base
-FROM debian:buster-slim
+FROM amazonlinux:2
 
 # set the github runner version
 ARG RUNNER_VERSION="2.298.2"
 
 # update the base packages and add a non-sudo user
-RUN apt-get update -y && apt-get upgrade -y && useradd -m builder
+RUN yum update -y && yum install -y shadow-utils && useradd -m builder
 
 # install python and the packages the your code depends on along with jq so we can parse JSON
 # add additional packages as necessary
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    curl build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip \
-    wget awscli strace less vim sudo
-# cron rsyslog
+RUN yum install -y curl python3 python-virtualenv python3-pip \
+    wget awscli strace less vim sudo tar
 
 # required for chetan/invalidate-cloudfront-action@v2; must be 1.6 (buster ships 1.5)
 RUN curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq \
@@ -27,6 +25,9 @@ RUN cd /home/builder && mkdir actions-runner && cd actions-runner \
 RUN echo ACTIONS_RUNNER_HOOK_JOB_STARTED=/home/builder/pre-run.sh >>/home/builder/actions-runner/.env
 COPY pre-run.sh /home/builder/pre-run.sh
 RUN chmod +x /home/builder/pre-run.sh
+
+# trick the installer into treading us like centos
+RUN ln -s /etc/os-release /etc/redhat-release
 
 # install some additional dependencies
 RUN chown -R builder ~builder /opt && /home/builder/actions-runner/bin/installdependencies.sh
@@ -44,7 +45,7 @@ RUN chmod +x start.sh
 # RUN crontab crontab
 
 # make builder able to run apt-get without a password
-RUN usermod -aG sudo builder
+RUN usermod -aG wheel builder
 RUN echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # since the config and run script for actions are not allowed to be run by root,
