@@ -41,9 +41,7 @@ jobs:
       - uses: docker/metadata-action@v4
         id: meta
         with:
-          images: |
-            teaxyz/cli
-            ${{ env.GHCR_REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.GHCR_REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch,prefix=
