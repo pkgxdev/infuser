@@ -14,6 +14,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     wget awscli strace less vim sudo
 # cron rsyslog
 
+# remove unneeded -dev packages that can cover our dependencies
+RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y --purge \
+    libexpat1-dev libssl-dev libffi-dev
+
 # required for chetan/invalidate-cloudfront-action@v2; must be 1.6 (buster ships 1.5)
 RUN curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq \
     && chmod a+rx /usr/local/bin/jq
